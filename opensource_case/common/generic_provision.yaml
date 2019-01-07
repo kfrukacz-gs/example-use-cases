@@ -7,10 +7,6 @@ imports:
 inputs:
   manager_network:
     description: Management network.
-  private_key_path:
-    description: >
-      The content of the agent's private key.
-    default: { get_secret: private_key_path }
   image_name:
     description: >
       An Openstack Image ID. Tested with a Ubuntu 14.04 image.
@@ -20,11 +16,8 @@ inputs:
     description: >
       An Openstack Flavor ID.
     default: '2'
-  key_pair_name:
-    description: key pair name
 
 dsl_definitions:
-
   openstack_config: &openstack_config
     username: { get_secret: keystone_username }
     password: { get_secret: keystone_password }
@@ -32,19 +25,15 @@ dsl_definitions:
     auth_url: { get_secret: keystone_url }
     region: { get_secret: keystone_region }
 
-node_types:
+node_templates:
   host:
-    derived_from: cloudify.openstack.nodes.Server
+    type: cloudify.openstack.nodes.Server
     properties:
-      openstack_config:
-        default: *openstack_config
+      openstack_config: *openstack_config
       agent_config:
-        default:
           install_method: none
       server:
-        default:
           key_name: ''
           image: { get_input: image_name }
           flavor: { get_input: flavor }
-      management_network_name:
-        default: ''
+      management_network_name:  { get_input: manager_network }
